@@ -7,13 +7,13 @@ comments: true
 <!--<img src="/images/fulls/01.jpg" class="fit image">-->
 <img src="http://phantomjs.org/img/phantomjs-logo.png" alt="PhantomJS" width="240" height="80">
 <br>
-當年在使用AngularJS開發的時代，老人家都知道尋引擎對於SPA網站動態render的內容無法抓取，也就是對於SEO不是很和善。再加上動態頁面常常用Hash fragments # 來做頁面的網址，於是乎Google訂了一套規則，這就不多說了看當年說明<a href="https://developers.google.com/webmasters/ajax-crawling/docs/specification" target="_blank">Full Specification說明</a>、<a href="https://www.facebook.com/groups/610219582353481/permalink/710236869018418/" target="_blank">說好的技術呢社團筆記</a>比較快。
+當年在使用AngularJS開發的時代，老人家都知道網路爬蟲對於SPA網站動態render的內容無法抓取，也就是對於SEO不是很和善。再加上動態頁面常常用Hash fragments # 來做頁面的網址，於是乎Google訂了一套規則，這就不多說了看當年說明<a href="https://developers.google.com/webmasters/ajax-crawling/docs/specification" target="_blank">Full Specification說明</a>、<a href="https://www.facebook.com/groups/610219582353481/permalink/710236869018418/" target="_blank">說好的技術呢社團筆記</a>比較快。
 
 時至今日Google又翻盤了，大家辛辛苦苦做的辛勞都白廢掉了。新的<a href="https://webmasters.googleblog.com/2014/10/updating-our-technical-webmaster.html" target="_blank">管理員指南</a>簡單的說就是只要你給撈股溝大神就都撈的到，但是真的是這樣嗎？做人還是要小心點以免被坑了都不知道，不過這篇要講的不是這個坑。
 
 到現在大家最流行的SPA網站最流行的解法就是Server-Side Rendering，各家前端框架都各自有方式去做SSR，但是首先需要有node server或是用<a href="https://blogs.msdn.microsoft.com/webdev/2017/02/14/building-single-page-applications-on-asp-net-core-with-javascriptservices/" target="_blank">ASP.NET Core</a>去跑否則還生不太出來呢，所以另外一些舊解法就是沒有node server的公司的解決之道，使用一些像<a href="https://prerender.io/" target="_blank">Prerender.io</a>、<a href="http://getseojs.com/" target="_blank">SEO.js</a>、<a href="http://www.brombone.com/" target="_blank">BromBone</a>、<a href="https://www.seo4ajax.com/" target="_blank">SEO4Ajax</a>等Prerender服務花錢消災。
 
-要入手當然選最多人討論且開源的Prerender.io，經過研究它是用PhontomJS去抓取網站內容後回給搜尋引擎，PhontomJS也會被拿來搭配寫測試，於是乎半年前入坑測試，自行在Laravel網站架構下經過一番掙扎安裝了<a href="http://jonnnnyw.github.io/php-phantomjs/" target="_blank">php-phantomjs</a>又用了<a href="https://github.com/symfony/dom-crawler" target="_blank">dom-crawler</a>把判斷為web crawler的來源改用PhontomJS抓取頁面再回給前端，PhontomJ不須依附於Node.js所以可以獨立運作，效果有達到但是速度會有點慢，反正他一天頂多也就來個幾次無所謂啦這樣安慰自己。過一段時間後最近又使用prerender.io在AWS上架了node server來測試後發現不錯喔功能更完整，速度快了一倍左右。測測Angular4專案又測測以前做的React網站再測測後來新的React專案，靠～～～～～～～
+要入手當然選最多人討論且開源的Prerender.io，經過研究它是用PhontomJS去抓取網站內容後回給搜尋引擎，PhontomJS也會被拿來搭配寫測試，於是乎半年前入坑測試，自行在Laravel網站架構下經過一番掙扎安裝了<a href="http://jonnnnyw.github.io/php-phantomjs/" target="_blank">php-phantomjs</a>又用了<a href="https://github.com/symfony/dom-crawler" target="_blank">dom-crawler</a>把判斷為web crawler的來源改用PhontomJS抓取頁面再回給前端，PhontomJS不須依附於Node.js所以可以獨立運作，效果有達到但是速度會有點慢，反正他一天頂多也就來個幾次無所謂啦這樣安慰自己。過一段時間後最近又使用Prerender.io在AWS上架了node server用pm2跑來測試後發現不錯喔功能更完整，速度快了一倍左右。測測Angular4專案又測測以前做的React網站再測測後來新的React專案，靠～～～～～～～
 
 為什麼我的React 15.5.4專案會只跑出```<!-- react-empty: 1 -->```是怎樣啦，舊專案很正常啊，改用webpack 2 bundle的關係嗎？不對啊Angular 4也是啊，因為改用react-router 4嗎?不對啊沒用router也是不行啊，強制用JS在React render後讀取頁面innerHTML再取代它，見鬼抓出來的還是```<!-- react-empty: 1 -->```，還好這世界上一定不是我第一個人踩到，簡單上去Google果然有人遇到。
 
