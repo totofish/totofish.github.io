@@ -1,58 +1,7 @@
-# Strata Reloaded
+# 關於
 
-Simple, clean personal blogging template for Jekyll based on Strata by HTML5 UP.
+基於對Open Source的好感(免費的部分)，還有開發過程常犯同樣的錯踩同樣的坑，踩了又踩好幾次後恍然想起以前幹過！
 
-![Strata Reloaded template screenshot](images/_screenshot.png)
+因此在這做個筆記，讓健忘的自己容易回想當初踩過，不是坑人就是被坑，坑過後才會成長。請記得都標上超連結方便自己查詢～(這是提醒自己的)
 
-## Features
-
-* Parallax background effect
-* Lightbox gallery
-* Pre-styled components
-* Blog with pagination
-* Configurable footer
-* Optimized for editing in [CloudCannon](http://cloudcannon.com/)
-* RSS/Atom feed
-* SEO tags
-* Google Analytics
-* Webmaster Verification
-
-## Develop
-
-1. Add your site and author details in `_config.yml`.
-2. Add your Google Analytics key to `_config.yml`.
-3. Get a workflow going to see your site's output (with [CloudCannon](https://app.cloudcannon.com/) or Jekyll locally).
-
-## Develop
-
-Urban was built with [Jekyll](http://jekyllrb.com/) version 3.3.1, but should support newer versions as well.
-
-Install the dependencies with [Bundler](http://bundler.io/):
-
-~~~bash
-$ bundle install
-~~~
-
-Run `jekyll` commands through Bundler to ensure you're using the right versions:
-
-~~~bash
-$ bundle exec jekyll serve
-~~~
-
-## Editing
-
-Strata Reloaded is already optimized for adding, updating and removing posts and footer elements in [CloudCannon](https://app.cloudcannon.com/).
-
-### Posts
-
-* Add, update or remove a post in the *Posts* collection.
-* Change the defaults when new posts are created in `_posts/_defaults.md`.
-
-### Footer
-
-* Exposed as a data file to give clients better access.
-* Set in the *Data* / *Footer* section.
-
-## License
-
-Free for personal and commercial use under the CCA 3.0 license. See LICENSE file for additional information and terms of use. This theme was adapted from Strata by HTML5 UP for use with [CloudCannon](http://cloudcannon.com) by [Comfusion LLC](http://comfusionllc.com).
+本站使用<a href="https://jekyllrb.com/" target="_blank">jekyll</a>、<a href="https://html5up.net/strata" target="_blank">樣板Strata</a>、<a href="https://disqus.com/" target="_blank">Disqus</a>構成。
