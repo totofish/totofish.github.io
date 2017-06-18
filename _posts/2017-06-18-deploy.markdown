@@ -1,0 +1,43 @@
+---
+layout: post
+title: 個人簡單版快速部署上傳筆記
+comments: true
+---
+
+這世界上什麼人最懶，絕對不是工程師，肯定是懶人最懶，工程師的偷懶方法都是來順著懶人特性而開發的。
+
+身為工程師自認為還算勤勞，很少使用快速鍵，~~不是因為記不住~~，能不厭其煩的重複做同一個動作，例如將圖片optimization、將多隻js concat合併，將build後的檔案扔上FTP等等，個人可以一而再，再而三的重複作著，跟他耗下去，不透過大腦做著重複性工作是讓大腦休息的好時機。然而專案常會有多人協同開發的機會，遇到懶人就會抱怨說難道不能自動圖片優化、自動合併、自動壓縮、自動上傳嗎？
+
+還好世界上多的是解法，大部分都能自動處理，包含自動上傳，這次來筆記一下目前個人用過的簡單自動部署的2種方法 -> <a href="http://gulpjs.com/" target="_blank">Gulp</a> 和 <a href="https://jenkins.io/" target="_blank">Jenkins</a>。
+
+自己在建置前端專案上有個習慣是最後build所有的檔案都會自動統一彙整到dist資料夾，基本上使用webpack所有加進entry中的、import進來的css或img等都能透過webpack bundle到指定的目錄，但還是會有一些外部資源如字型、其他圖片、其他不想bundle在一起的vender library等便會透過gulp處理集中到/dist，並且這一整包就是正式結構，只要整包原封不動替換上server就可以用。因此要做自動上傳到server上相對單純，只要傳得上去就解決了。(後來使用angular-cli感覺有點憋扭就是因為build後html、js、font、css散了一地，但為了方便更新angular-cli時改動小一點所以不想ng eject它來改配置)
+
+{% highlight Json %}
+  "scripts": {
+    "release": "gulp && webpack --release && gulp ftp && opener http://www.site.com/project",
+  }
+{% endhighlight %}
+
+首先方法一在幾年前還在數位代理商時期就透過<a href="https://github.com/sindresorhus/gulp-ftp" target="_blank">gulp-ftp</a>將檔案上傳，後來改成使用<a href="https://github.com/morris/vinyl-ftp" target="_blank">vinyl-ftp</a>，使用方法很簡單自己看一下就知道。使用上踩過的一個坑是同時上傳檔案的數量不能太多，不然可能會被擋，導致常常部分檔案上傳失敗。
+
+{% highlight JavaScript %}
+// 上傳FTP
+gulp.task('ftp', function () {
+  var conn = ftp.create( {
+    host:     'xxx.xxx.xxx.xxx',
+    user:     'user',
+    password: 'password',
+    parallel: 5,  // 不要設太大
+    log:      $.util.log
+  } );
+  return gulp.src(['dist/**/*'], { base: 'dist/', buffer: false } )
+    .pipe( conn.newer( '/public_html' ) )
+    .pipe( conn.dest( '/public_html' ) );
+});
+{% endhighlight %}
+
+另一個方法就是使用Jenkins，當git有新的push就deploy到網站上。由於這幾年Docker流行，架設Jenkins變得異常省事，直接run <a href="https://hub.docker.com/_/jenkins/" target="_blank">Official Jenkins Docker image</a>就好啦，雖然還有一些細節要設但是基本上比當年從頭裝起省很多事。個人版控也是使用Docker上跑的<a href="https://hub.docker.com/r/gitlab/gitlab-ce/" target="_blank">GitLab</a>服務，流程上是只要push上GitLab，Jenkins設定的Job就會收到Webhooks Event，然後會clone專案下來build，完成後將/dist先封存成品後再push專案回GitLab分支然後SSH Publish上AWS的指定目錄。
+
+全部主要使用了<a href="https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin" target="_blank">GitLab Plugin</a>(不要再用Gitlab Hook Plugin，這坑我踩過了)、<a href="https://wiki.jenkins.io/display/JENKINS/Publish+Over+SSH+Plugin" target="_blank">Publish Over SSH</a>、<a href="https://wiki.jenkins.io/display/JENKINS/NodeJS+Plugin" target="_blank">NodeJS Plugin</a>，其餘是預設安裝的Plugin，從名稱上看大概就知道各是做何用處。這邊推薦使用NodeJS Plugin來安裝NodeJS，除了可以更方便切換版本、安裝全域npm package，也方便同時安裝NodeJS到Slave節點，比直接指令安裝好處多很多。
+
+懶人的需求創造很多自動化的作法，但每當回過頭就會發現，也花了不少時間在建置這些流程，最後享受到的還是懶人，但也因為有需求就會有商機，像是<a href="https://tinypng.com/developers/reference/nodejs" target="_blank">TinyPNG</a>提供付費API來賺取懶人的錢。或許這是勤勞的人另一種可以賺錢的管道。

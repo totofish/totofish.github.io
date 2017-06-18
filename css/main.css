@@ -2076,7 +2076,11 @@
 		}
 
 			.image.avatar:before {
-				display: none;
+				/*display: none;*/
+				-webkit-box-shadow: inset -12px -12px 40px 5px rgba(0,0,0,1);
+				-moz-box-shadow: inset -12px -12px 40px 5px rgba(0,0,0,1);
+				box-shadow: inset -12px -12px 40px 5px rgba(0,0,0,1);
+    		border-radius: 100%;
 			}
 
 			.image.avatar img {
