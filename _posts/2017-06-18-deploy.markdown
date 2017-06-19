@@ -4,6 +4,10 @@ title: 個人簡單版快速部署上傳筆記
 comments: true
 ---
 
+
+<img src="https://raw.githubusercontent.com/gulpjs/artwork/master/gulp-2x.png" alt="Gulp" height="80" style="margin-right: 20px;">
+<img src="https://wiki.eclipse.org/images/d/d8/Jenkins_logo.png" alt="Jenkins" height="80">
+<br>
 這世界上什麼人最懶，絕對不是工程師，肯定是懶人最懶，工程師的偷懶方法都是來順著懶人特性而開發的。
 
 身為工程師自認為還算勤勞，很少使用快速鍵，~~不是因為記不住~~，能不厭其煩的重複做同一個動作，例如將圖片optimization、將多隻js concat合併，將build後的檔案扔上FTP等等，個人可以一而再，再而三的重複作著，跟他耗下去，不透過大腦做著重複性工作是讓大腦休息的好時機。然而專案常會有多人協同開發的機會，遇到懶人就會抱怨說難道不能自動圖片優化、自動合併、自動壓縮、自動上傳嗎？

@@ -4,7 +4,6 @@ title: SPA SEO + PhantomJs坑
 comments: true
 ---
 
-<!--<img src="/images/fulls/01.jpg" class="fit image">-->
 <img src="http://phantomjs.org/img/phantomjs-logo.png" alt="PhantomJS" width="240" height="80">
 <br>
 當年在使用AngularJS開發的時代，老人家都知道網路爬蟲對於SPA網站動態render的內容無法抓取，也就是對於SEO不是很和善。再加上動態頁面常常用Hash fragments # 來做頁面的網址，於是乎Google訂了一套規則，這就不多說了看當年說明<a href="https://developers.google.com/webmasters/ajax-crawling/docs/specification" target="_blank">Full Specification說明</a>、<a href="https://www.facebook.com/groups/610219582353481/permalink/710236869018418/" target="_blank">說好的技術呢社團筆記</a>比較快。
