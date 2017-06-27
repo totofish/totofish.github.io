@@ -1,0 +1,159 @@
+---
+layout: post
+title: Jest & Mocha設定
+comments: true
+---
+
+
+<img src="https://facebook.github.io/jest/img/opengraph.png" alt="Jest" height="100">
+<img src="https://cldup.com/xFVFxOioAU.svg" alt="Mocha" height="100">
+<br>
+使用React常聽到的JavaScript Testing framework就是Facebook推出的<a href="https://facebook.github.io/jest/" target="_blank">Jest</a>跟<a href="https://mochajs.org/" target="_blank">Mocha</a>，一般正常專案設置上應該不會太複雜，但如果用到太多詭異的作法就會踩到很多坑，要一一解決，這邊做個紀錄以免下次又忘記。
+
+描敘一下遇到的專案比較不一樣的開發設定部分讓跑測試時會出錯的地方
+* 因應webpack 2版本以後新的建議設定```.babelrc {"modules": false}```，Jest & Mocha都會報錯。
+{% highlight Json %}
+"presets": [
+  ["es2015", {"modules": false}]
+]
+{% endhighlight %}
+
+* 使用Decorator```babel-plugin-transform-decorators-legacy```，測試吃的```.babelrc```設定沒設會報錯。
+{% highlight Json %}
+"plugins": [
+  "babel-plugin-transform-decorators-legacy"
+]
+{% endhighlight %}
+
+* webpack有設定alias時，Jest & Mocha都會找不到module正確位置。
+{% highlight Javascript %}
+// component
+import * as types from '@/constants/actionTypes'
+
+// webpack config
+resolve: {
+  modules: [
+    "node_modules",
+    path.resolve(__dirname, "src"),
+    path.resolve(__dirname, "lib")
+  ],
+  alias: {
+    '@': path.resolve(__dirname, "src")
+  }
+}
+{% endhighlight %}
+
+* 用Decorator方式使用redux的connect時要測試這component需要包進```Provider```，如果想單純只測試component不想引入測試reducer state就不能用Decorator寫法。
+{% highlight Javascript %}
+@connect(
+  state => ({...}),
+  dispatch => bindActionCreators({...}, dispatch)
+)
+export default class MyComponent extends Component {
+  ...
+}
+
+// 寫測試時
+import MyComponent from 'MyComponent'
+const wrapper = mount(
+  <Provider store={store}>
+    <MyComponent />
+  </Provider>
+);
+{% endhighlight %}
+
+{% highlight Javascript %}
+export class MyComponent extends Component {
+  ...
+}
+
+export default connect(
+  state => ({...}),
+  dispatch => bindActionCreators({...}, dispatch)
+)(MyComponent);
+
+
+// 寫測試時可以只單純測試component本身
+import { MyComponent } from 'MyComponent'
+const wrapper = shallow(
+  <MyComponent />
+);
+{% endhighlight %}
+
+## Jest設置
+
+<a href="http://facebook.github.io/jest/docs/zh-Hans/tutorial-react.html" target="_blank">Jest安裝設定</a>蠻單純的，基本上算很省事，但是當有設置alias時就需要在```package.json```中去加```moduleNameMapper```設定
+{% highlight Json %}
+"jest": {
+  "moduleDirectories": [
+    "node_modules",
+    "bower_components",
+    "src"
+  ],
+  "moduleNameMapper": {
+    "^@(.*)$": "<rootDir>/src$1"
+  }
+}
+{% endhighlight %}
+
+此外```.babelrc```中```es2015```也要注意不能使用```{"modules": false}```，使用到的plugins也要加進設定，整理完類似下面這樣就可以跑了
+{% highlight Json %}
+{
+  "presets": [
+    ["es2015", {"modules": false}],
+    "stage-0",
+    "react"
+  ],
+  "plugins": [
+    "babel-plugin-transform-decorators-legacy",
+  ],
+  "env": {
+    "test": {
+      "presets": ["es2015", "stage-0", "react"],
+      "plugins": [
+        "babel-plugin-transform-decorators-legacy"
+      ]
+    }
+  }
+}
+{% endhighlight %}
+
+## Mocha設置
+
+Mocha設定上很不算複雜但是有很多坑需要用不同的方式才能解決，甚至要靠其他plugin。搭配使用<a href="http://airbnb.io/enzyme/" target="_blank">enzyme</a>時，因為enzyme的mount API需要瀏覽器環境中才能用，所以要搭配JSDOM(Jest就不需要)，更詭異的是不像Jest會自動吃```.babelrc```中env下面test的設定，需要指定環境變數```NODE_ENV=test```才能讓他吃到test的設定，所以執行會類似這樣
+{% highlight Json %}
+"scripts": {
+  "test": "NODE_PATH=./src NODE_ENV=test mocha test/helpers/browser.js test/**/*.spec.js"
+}
+{% endhighlight %}
+使用NODE_ENV=test有個問題是會改到node的環境設定，當你正常跑專案時可能會導致反而吃到test的設定而出錯，像是我使用```bundle-loader```去Lazy load Module時需要```["es2015", {"modules": false}]```，但測試時需要```{"modules": false}```得拿掉，所以在run dev時又需要特地把```NODE_ENV=production```指定回來
+{% highlight Json %}
+"scripts": {
+  "dev": "NODE_ENV=production gulp webpack-dev-server"
+}
+{% endhighlight %}
+
+另外當有使用webpack alias設定時就慘了，找很久找不到類似Jest本身可以設定```moduleNameMapper```的方式來處理掉，目前有效的解法就是使用<a href="https://github.com/trayio/babel-plugin-webpack-alias" target="_blank">babel-plugin-webpack-alias</a>來處理了。
+{% highlight Json %}
+"test": {
+  "presets": ["es2015", "stage-0", "react"],
+  "plugins": [
+    "babel-plugin-transform-decorators-legacy",
+    [ "babel-plugin-webpack-alias", { "config": "./webpack.config.mocha.js" } ]
+  ]
+}
+{% endhighlight %}
+
+{% highlight Javascript %}
+// webpack.config.mocha.js
+const path = require("path")
+module.exports = {
+    resolve: {
+        alias: {
+          '@': path.resolve(__dirname, "src")
+        }
+    }
+};
+{% endhighlight %}
+
+最後其他感想是Jest本身也可以跑```Coverage```報表，Mocha還要另外搭別的去跑，而且Jest也可以跑Mocha用的test程式感覺Jest發展的越來越好了，只是有個小問題是錯誤資訊很少，不像Mocha會有詳細的錯誤資訊，但如果真要選一個本身可能還是選Jest吧，或是選擇不要寫測試了～哇哈哈哈
