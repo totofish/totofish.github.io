@@ -156,4 +156,4 @@ module.exports = {
 };
 {% endhighlight %}
 
-最後其他感想是Jest本身也可以跑```Coverage```報表，Mocha還要另外搭別的去跑，而且Jest也可以跑Mocha用的test程式感覺Jest發展的越來越好了，只是有個小問題是錯誤資訊很少，不像Mocha會有詳細的錯誤資訊，但如果真要選一個本身可能還是選Jest吧，或是選擇不要寫測試了～哇哈哈哈
+最後其他感想是Jest本身也可以跑```Coverage```報表，Mocha還要另外搭別的去跑，而且Jest也可以跑Mocha用的test程式感覺Jest發展的越來越好了，只是有個小問題是錯誤資訊很少，不像Mocha會有詳細的錯誤資訊，但如果真要選一個本身可能還是選Jest吧，或是~~不要寫測試了~~～哇哈哈哈
